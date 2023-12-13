@@ -41,6 +41,14 @@ export class UserService {
     if (!existingUser) {
       throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
     }
+
+    const otherUserWithSameId = await this.userModel
+      .findOne({ user_id, _id: { $ne: existingUser._id } })
+      .exec();
+    if (otherUserWithSameId) {
+      throw new ConflictException(`User ID '${user_id}' sudah terdaftar`);
+    }
+
     const updatedUser = await this.userModel
       .findByIdAndUpdate(user_id, userDto, { new: true })
       .exec();
