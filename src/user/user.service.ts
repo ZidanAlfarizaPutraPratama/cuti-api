@@ -29,7 +29,7 @@ export class UserService {
       .findByIdAndUpdate(user_id, userDto, { new: true })
       .exec();
     if (!updatedUser) {
-      throw new NotFoundException(`User with ID ${user_id} not found`);
+      throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
     }
     return updatedUser;
   }
@@ -37,7 +37,7 @@ export class UserService {
   async delete(user_id: string): Promise<void> {
     const deletedUser = await this.userModel.findByIdAndDelete(user_id).exec();
     if (!deletedUser) {
-      throw new NotFoundException(`User with ID ${user_id} not found`);
+      throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
     }
   }
 }
