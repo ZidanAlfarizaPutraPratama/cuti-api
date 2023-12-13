@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schema/user.schema';
@@ -16,8 +20,16 @@ export class UserService {
   }
 
   async create(userDto: UserDto): Promise<User> {
+    const { user_id } = userDto;
+
+    const existingUser = await this.userModel.findOne({ user_id }).exec();
+
+    if (existingUser) {
+      throw new ConflictException(`User ID '${user_id}' sudah terdaftar`);
+    }
+
     const newUser = new this.userModel(userDto);
-    return newUser.save();
+    return await newUser.save();
   }
 
   async findById(id: string): Promise<User | null> {
@@ -25,19 +37,21 @@ export class UserService {
   }
 
   async update(user_id: string, userDto: UserDto): Promise<User | null> {
+    const existingUser = await this.userModel.findById(user_id).exec();
+    if (!existingUser) {
+      throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
+    }
     const updatedUser = await this.userModel
       .findByIdAndUpdate(user_id, userDto, { new: true })
       .exec();
-    if (!updatedUser) {
-      throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
-    }
     return updatedUser;
   }
 
   async delete(user_id: string): Promise<void> {
-    const deletedUser = await this.userModel.findByIdAndDelete(user_id).exec();
-    if (!deletedUser) {
+    const existingUser = await this.userModel.findById(user_id).exec();
+    if (!existingUser) {
       throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
     }
+    await this.userModel.findByIdAndDelete(user_id).exec();
   }
 }

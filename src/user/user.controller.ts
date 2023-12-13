@@ -53,7 +53,7 @@ export class UserController {
   ): Promise<{ success: boolean; message: string }> {
     try {
       await this.userService.delete(user_id);
-      return { success: true, message: 'User berhasil' };
+      return { success: true, message: 'User berhasil dihapus' };
     } catch (error) {
       return { success: false, message: error.message };
     }
