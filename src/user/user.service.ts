@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -41,14 +42,14 @@ export class UserService {
     if (!existingUser) {
       throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
     }
-
     const otherUserWithSameId = await this.userModel
-      .findOne({ user_id, _id: { $ne: existingUser._id } })
+      .findOne({ _id: { $ne: existingUser._id }, user_id })
       .exec();
     if (otherUserWithSameId) {
       throw new ConflictException(`User ID '${user_id}' sudah terdaftar`);
+    } else {
+      throw new InternalServerErrorException(`user_id sudah terdaftar`);
     }
-
     const updatedUser = await this.userModel
       .findByIdAndUpdate(user_id, userDto, { new: true })
       .exec();
