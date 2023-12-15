@@ -16,43 +16,67 @@ export class LeavePermissionsService {
   ) {}
 
   async findAll(): Promise<LeavePermissions[]> {
-    return this.LeavePermissionsModel.find().exec();
+    try {
+      return await this.LeavePermissionsModel.find().exec();
+    } catch (error) {
+      throw error;
+    }
   }
 
   async create(
     leavePermissionsDto: leavePermissionsDto,
   ): Promise<LeavePermissions> {
-    const { leave_permissions_id } = leavePermissionsDto;
+    try {
+      const { leave_permissions_id } = leavePermissionsDto;
 
-    const existingLeavePermissions = await this.LeavePermissionsModel.findOne({
-      leave_permissions_id,
-    }).exec();
+      const existingLeavePermissions = await this.LeavePermissionsModel.findOne(
+        {
+          leave_permissions_id,
+        },
+      ).exec();
 
-    if (existingLeavePermissions) {
-      throw new ConflictException(
-        `Leave Permissions ID '${leave_permissions_id}' sudah terdaftar`,
+      if (existingLeavePermissions) {
+        throw new ConflictException(
+          `Leave Permissions ID '${leave_permissions_id}' sudah terdaftar`,
+        );
+      }
+
+      const newLeavePermissions = new this.LeavePermissionsModel(
+        leavePermissionsDto,
       );
+      return await newLeavePermissions.save();
+    } catch (error) {
+      throw error;
     }
-
-    const newLeavePermissions = new this.LeavePermissionsModel(
-      leavePermissionsDto,
-    );
-    return await newLeavePermissions.save();
   }
 
   async findById(id: string): Promise<LeavePermissions | null> {
-    return this.LeavePermissionsModel.findById(id).exec();
-  }
-  async delete(leave_permissions_id: string): Promise<void> {
-    const existingLeavePermissions =
-      await this.LeavePermissionsModel.findById(leave_permissions_id).exec();
-    if (!existingLeavePermissions) {
-      throw new NotFoundException(
-        `Izin dengan ID ${leave_permissions_id} tidak ditemukan`,
-      );
+    try {
+      return await this.LeavePermissionsModel.findById(id).exec();
+    } catch (error) {
+      throw error;
     }
-    await this.LeavePermissionsModel.findByIdAndDelete(
-      leave_permissions_id,
-    ).exec();
+  }
+
+  async delete(
+    leave_permissions_id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const existingLeavePermissions =
+        await this.LeavePermissionsModel.findById(leave_permissions_id).exec();
+      if (!existingLeavePermissions) {
+        throw new NotFoundException(
+          `Izin dengan ID ${leave_permissions_id} tidak ditemukan`,
+        );
+      }
+
+      await this.LeavePermissionsModel.findByIdAndDelete(
+        leave_permissions_id,
+      ).exec();
+
+      return { success: true, message: 'Izin berhasil dihapus' };
+    } catch (error) {
+      throw error;
+    }
   }
 }

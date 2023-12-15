@@ -1,6 +1,4 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { v4 as uuidv4 } from 'uuid';
-
 export enum Status {
   OPEN = 'OPEN',
   PROCES = 'PROCESS',
@@ -10,7 +8,7 @@ export enum Status {
 
 @Schema()
 export class LeavePermissions {
-  @Prop({ type: String, default: uuidv4, unique: true })
+  @Prop({ type: String, unique: true })
   leave_permissions_id: string;
 
   @Prop({ default: '-' })

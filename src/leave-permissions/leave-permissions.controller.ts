@@ -1,13 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { LeavePermissionsService } from './leave-permissions.service';
 import { LeavePermissions } from 'src/schema/leave-permissions.schema';
 import { leavePermissionsDto } from 'src/dto/leave-permissions.dto';
