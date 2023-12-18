@@ -27,7 +27,7 @@ export class LeavePermissionsService {
     leavePermissionsDto: leavePermissionsDto,
   ): Promise<LeavePermissions> {
     try {
-      const { leave_permissions_id } = leavePermissionsDto;
+      const leave_permissions_id = this.generateLeavePermissionsId();
 
       const existingLeavePermissions = await this.LeavePermissionsModel.findOne(
         {
@@ -41,13 +41,23 @@ export class LeavePermissionsService {
         );
       }
 
+      leavePermissionsDto.leave_permissions_id = leave_permissions_id;
+
       const newLeavePermissions = new this.LeavePermissionsModel(
         leavePermissionsDto,
       );
+
       return await newLeavePermissions.save();
     } catch (error) {
       throw error;
     }
+  }
+
+  generateLeavePermissionsId() {
+    const timestamp = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).substr(2, 5);
+
+    return `${timestamp}${randomPart}`;
   }
 
   async findById(id: string): Promise<LeavePermissions | null> {
