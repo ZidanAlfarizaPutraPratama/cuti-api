@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { LeavePermissions } from 'src/schema/leave-permissions.schema';
 import { leavePermissionsDto } from 'src/dto/leave-permissions.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class LeavePermissionsService {
@@ -27,7 +28,7 @@ export class LeavePermissionsService {
     leavePermissionsDto: leavePermissionsDto,
   ): Promise<LeavePermissions> {
     try {
-      const leave_permissions_id = this.generateLeavePermissionsId();
+      const leave_permissions_id = uuidv4();
 
       const existingLeavePermissions = await this.LeavePermissionsModel.findOne(
         {
@@ -52,14 +53,6 @@ export class LeavePermissionsService {
       throw error;
     }
   }
-
-  generateLeavePermissionsId() {
-    const timestamp = Date.now().toString(36);
-    const randomPart = Math.random().toString(36).substr(2, 5);
-
-    return `${timestamp}${randomPart}`;
-  }
-
   async findById(id: string): Promise<LeavePermissions | null> {
     try {
       return await this.LeavePermissionsModel.findById(id).exec();
