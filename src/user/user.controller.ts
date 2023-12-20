@@ -6,8 +6,11 @@ import {
   Post,
   Put,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { AuthGuard } from '@nestjs/passport';
 import { User } from '../schema/user.schema';
 import { UserDto } from '../dto/user.dto';
 
@@ -57,5 +60,28 @@ export class UserController {
     } catch (error) {
       return { success: false, message: error.message };
     }
+  }
+  @Post('login')
+  async login(
+    @Body() { user_id, password },
+  ): Promise<{ success: boolean; token?: string; error?: string }> {
+    const user = await this.userService.findOne(user_id, password);
+
+    if (user) {
+      const token = await this.userService.generateToken(user);
+      return { success: true, token };
+    } else {
+      return { success: false, error: 'Invalid credentials' };
+    }
+  }
+  @Post('profile')
+  @UseGuards(AuthGuard())
+  getProfile(@Req() request: any): string {
+    const user = request.user;
+
+    const username = user.user_id;
+    const level = user.level;
+
+    return `Welcome, ${username}! Your level is ${level}.`;
   }
 }

@@ -8,12 +8,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../schema/user.schema';
 import { UserDto } from '../dto/user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -62,5 +64,13 @@ export class UserService {
       throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
     }
     await this.userModel.findByIdAndDelete(user_id).exec();
+  }
+
+  async findOne(username: string, password: string): Promise<User | null> {
+    return this.userModel.findOne({ user_id: username, password }).exec();
+  }
+  async generateToken(user: User): Promise<string> {
+    const payload = { sub: user.user_id, level: user.level };
+    return this.jwtService.sign(payload);
   }
 }
