@@ -61,15 +61,15 @@ export class UserController {
       return { success: false, message: error.message };
     }
   }
+
   @Post('login')
   async login(
     @Body() { user_id, password },
-  ): Promise<{ success: boolean; token?: string; error?: string }> {
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
     const user = await this.userService.findOne(user_id, password);
 
     if (user) {
-      const token = await this.userService.generateToken(user);
-      return { success: true, token };
+      return { success: true, message: 'Berhasil Login' };
     } else {
       return { success: false, error: 'Invalid credentials' };
     }

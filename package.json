@@ -28,6 +28,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "class-validator": "^0.14.0",
+    "ip": "^1.1.8",
     "mongoose": "^8.0.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

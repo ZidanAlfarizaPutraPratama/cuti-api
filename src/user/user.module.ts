@@ -8,7 +8,6 @@ import { PassportModule } from '@nestjs/passport';
 import { User, UserSchema } from '../schema/user.schema';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -24,6 +23,6 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, JwtStrategy],
+  providers: [UserService],
 })
 export class UserModule {}
