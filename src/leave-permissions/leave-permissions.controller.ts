@@ -32,6 +32,7 @@ export class LeavePermissionController {
   ): Promise<LeavePermissions> {
     return this.leavePermissionsService.create(leavePermissionsDto);
   }
+
   @Delete(':id')
   async deleteLeavePermissions(
     @Param('id') leave_permissions_id: string,
