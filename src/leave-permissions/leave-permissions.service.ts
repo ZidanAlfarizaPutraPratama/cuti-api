@@ -16,7 +16,7 @@ export class LeavePermissionsService {
     private readonly LeavePermissionsModel: Model<LeavePermissions>,
   ) {}
 
-  async findAll(): Promise<LeavePermissions[]> {
+  async findAll() {
     try {
       return await this.LeavePermissionsModel.find().exec();
     } catch (error) {

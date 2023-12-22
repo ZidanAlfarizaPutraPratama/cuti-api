@@ -11,8 +11,19 @@ export class LeavePermissionController {
   ) {}
 
   @Get()
-  async getAllLeavePermission(): Promise<LeavePermissions[]> {
-    return this.leavePermissionsService.findAll();
+  async getAllLeavePermission() {
+    const result = await this.leavePermissionsService.findAll();
+    const resultMapped = result.map((cuti: any) => {
+      const tanggal_mulai = cuti.tanggal_mulai.toISOString();
+      cuti.sliced_tanggal_mulai = tanggal_mulai.slice(0, 10);
+
+      const tanggal_akhir = cuti.tanggal_akhir.toISOString();
+      cuti.sliced_tanggal_akhir = tanggal_akhir.slice(0, 10);
+
+      return cuti;
+    });
+
+    return resultMapped;
   }
 
   @Post()
