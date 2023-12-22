@@ -44,18 +44,26 @@ export class UserService {
     if (!existingUser) {
       throw new NotFoundException(`User dengan ID ${user_id} tidak ditemukan`);
     }
+
     const otherUserWithSameId = await this.userModel
       .findOne({ _id: { $ne: existingUser._id }, user_id })
       .exec();
+
     if (otherUserWithSameId) {
       throw new ConflictException(`User ID '${user_id}' sudah terdaftar`);
-    } else {
-      throw new InternalServerErrorException(`user_id sudah terdaftar`);
     }
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(user_id, userDto, { new: true })
-      .exec();
-    return updatedUser;
+
+    try {
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(user_id, userDto, { new: true })
+        .exec();
+
+      return updatedUser;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Gagal menyimpan pembaruan user: ${error.message}`,
+      );
+    }
   }
 
   async delete(user_id: string): Promise<void> {
