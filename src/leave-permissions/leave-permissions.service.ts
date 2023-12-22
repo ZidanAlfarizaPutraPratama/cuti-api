@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { LeavePermissions } from 'src/schema/leave-permissions.schema';
+import { LeavePermissions, Status } from 'src/schema/leave-permissions.schema';
 import { leavePermissionsDto } from 'src/dto/leave-permissions.dto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,6 +19,38 @@ export class LeavePermissionsService {
   async findAll() {
     try {
       return await this.LeavePermissionsModel.find().exec();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateStatus(
+    id: string,
+    newStatus: Status,
+    updatedFields: Partial<LeavePermissions>,
+  ): Promise<LeavePermissions | null> {
+    try {
+      const existingLeavePermissions =
+        await this.LeavePermissionsModel.findById(id).exec();
+
+      if (!existingLeavePermissions) {
+        throw new NotFoundException(`Izin dengan ID ${id} tidak ditemukan`);
+      }
+
+      // Check for changes in fields other than 'status'
+      const unauthorizedChanges = Object.keys(updatedFields).filter(
+        (key) => key !== 'status',
+      );
+      if (unauthorizedChanges.length > 0) {
+        throw new ConflictException(
+          `Unauthorized changes to fields: ${unauthorizedChanges.join(', ')}`,
+        );
+      }
+
+      // Update only the 'status' field
+      existingLeavePermissions.status = newStatus;
+
+      return await existingLeavePermissions.save();
     } catch (error) {
       throw error;
     }

@@ -1,7 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  ConflictException,
+} from '@nestjs/common';
 import { LeavePermissionsService } from './leave-permissions.service';
-import { LeavePermissions } from 'src/schema/leave-permissions.schema';
+import { LeavePermissions, Status } from 'src/schema/leave-permissions.schema';
 import { leavePermissionsDto } from 'src/dto/leave-permissions.dto';
 
 @Controller('leave-permissions')
@@ -31,6 +40,26 @@ export class LeavePermissionController {
     @Body() leavePermissionsDto: leavePermissionsDto,
   ): Promise<LeavePermissions> {
     return this.leavePermissionsService.create(leavePermissionsDto);
+  }
+
+  @Put(':id')
+  updateStatus(
+    @Param('id') id: string,
+    @Body('status') newStatus: Status,
+    @Body() updatedFields: Partial<LeavePermissions>,
+  ): Promise<LeavePermissions | null> {
+    try {
+      return this.leavePermissionsService.updateStatus(
+        id,
+        newStatus,
+        updatedFields,
+      );
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw new ConflictException(error.message);
+      }
+      throw error;
+    }
   }
 
   @Delete(':id')
